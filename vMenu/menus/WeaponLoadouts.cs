@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -21,12 +22,12 @@ namespace vMenuClient
         private Menu ManageLoadoutMenu = new Menu("Mange Loadout", "Manage saved weapon loadout");
         public bool WeaponLoadoutsSetLoadoutOnRespawn { get; private set; } = UserDefaults.WeaponLoadoutsSetLoadoutOnRespawn;
 
-        private Dictionary<string, List<ValidWeapon>> SavedWeapons = new Dictionary<string, List<ValidWeapon>>();
+        private ConcurrentDictionary<string, List<ValidWeapon>> SavedWeapons = new ConcurrentDictionary<string, List<ValidWeapon>>();
 
-        public static Dictionary<string, List<ValidWeapon>> GetSavedWeapons()
+        public static ConcurrentDictionary<string, List<ValidWeapon>> GetSavedWeapons()
         {
             int handle = StartFindKvp("vmenu_string_saved_weapon_loadout_");
-            Dictionary<string, List<ValidWeapon>> saves = new Dictionary<string, List<ValidWeapon>>();
+            ConcurrentDictionary<string, List<ValidWeapon>> saves = new ConcurrentDictionary<string, List<ValidWeapon>>();
             while (true)
             {
                 string kvp = FindKvp(handle);
@@ -34,7 +35,7 @@ namespace vMenuClient
                 {
                     break;
                 }
-                saves.Add(kvp, JsonConvert.DeserializeObject<List<ValidWeapon>>(GetResourceKvpString(kvp)));
+                saves.TryAdd(kvp, JsonConvert.DeserializeObject<List<ValidWeapon>>(GetResourceKvpString(kvp)));
             }
             EndFindKvp(handle);
             return saves;
@@ -48,7 +49,7 @@ namespace vMenuClient
         /// Returns the saved weapons list, as well as sets the <see cref="SavedWeapons"/> variable.
         /// </summary>
         /// <returns></returns>
-        private Dictionary<string, List<ValidWeapon>> RefreshSavedWeaponsList()
+        private ConcurrentDictionary<string, List<ValidWeapon>> RefreshSavedWeaponsList()
         {
             if (SavedWeapons.Count > 0) SavedWeapons.Clear();
 
@@ -67,7 +68,7 @@ namespace vMenuClient
 
             foreach (var save in saves)
             {
-                SavedWeapons.Add(save, JsonConvert.DeserializeObject<List<ValidWeapon>>(GetResourceKvpString(save)));
+                SavedWeapons.TryAdd(save, JsonConvert.DeserializeObject<List<ValidWeapon>>(GetResourceKvpString(save)));
             }
 
             return SavedWeapons;

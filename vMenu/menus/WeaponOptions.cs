@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -23,10 +24,10 @@ namespace vMenuClient
         public bool AutoEquipChute { get; private set; } = UserDefaults.AutoEquipChute;
         public bool UnlimitedParachutes { get; private set; } = UserDefaults.WeaponsUnlimitedParachutes;
 
-        public static Dictionary<string, uint> AddonWeapons = new Dictionary<string, uint>();
+        public static ConcurrentDictionary<string, uint> AddonWeapons = new ConcurrentDictionary<string, uint>();
 
-        private Dictionary<Menu, ValidWeapon> weaponInfo;
-        private Dictionary<MenuItem, string> weaponComponents;
+        private ConcurrentDictionary<Menu, ValidWeapon> weaponInfo;
+        private ConcurrentDictionary<MenuItem, string> weaponComponents;
 
         #region Create Menu
         /// <summary>
@@ -35,8 +36,8 @@ namespace vMenuClient
         private void CreateMenu()
         {
             // Setup weapon dictionaries.
-            weaponInfo = new Dictionary<Menu, ValidWeapon>();
-            weaponComponents = new Dictionary<MenuItem, string>();
+            weaponInfo = new ConcurrentDictionary<Menu, ValidWeapon>();
+            weaponComponents = new ConcurrentDictionary<MenuItem, string>();
 
             #region create main weapon options menu and add items
             // Create the menu.
@@ -376,7 +377,7 @@ namespace vMenuClient
                         ItemData = stats
                     };
 
-                    weaponInfo.Add(weaponMenu, weapon);
+                    weaponInfo.TryAdd(weaponMenu, weapon);
 
                     MenuItem getOrRemoveWeapon = new MenuItem("Equip/Remove Weapon", "Add or remove this weapon to/form your inventory.")
                     {
@@ -481,7 +482,7 @@ namespace vMenuClient
                             {
                                 //Log($"{weapon.Name} : {comp.Key}");
                                 MenuItem compItem = new MenuItem(comp.Key, "Click to equip or remove this component.");
-                                weaponComponents.Add(compItem, comp.Key);
+                                weaponComponents.TryAdd(compItem, comp.Key);
                                 weaponMenu.AddMenuItem(compItem);
 
                                 #region Handle component button presses

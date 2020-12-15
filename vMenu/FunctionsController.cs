@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -2246,7 +2247,7 @@ namespace vMenuClient
         #endregion
 
         #region player overhead names
-        private Dictionary<Player, int> gamerTags = new Dictionary<Player, int>();
+        private ConcurrentDictionary<Player, int> gamerTags = new ConcurrentDictionary<Player, int>();
 
         private float playerNamesDistance = GetSettingsFloat(Setting.vmenu_player_names_distance) > 10f ? GetSettingsFloat(Setting.vmenu_player_names_distance) : 500f;
 
@@ -2283,7 +2284,7 @@ namespace vMenuClient
                                 if (!closeEnough)
                                 {
                                     RemoveMpGamerTag(gamerTags[p]);
-                                    gamerTags.Remove(p);
+                                    gamerTags.TryRemove(p, out int value);
                                 }
                                 else
                                 {
@@ -2292,7 +2293,7 @@ namespace vMenuClient
                             }
                             else if (closeEnough)
                             {
-                                gamerTags.Add(p, CreateMpGamerTag(p.Character.Handle, p.Name + $" [{p.ServerId}]", false, false, "", 0));
+                                gamerTags.TryAdd(p, CreateMpGamerTag(p.Character.Handle, p.Name + $" [{p.ServerId}]", false, false, "", 0));
                             }
                             if (closeEnough && gamerTags.ContainsKey(p))
                             {

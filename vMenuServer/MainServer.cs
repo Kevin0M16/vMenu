@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -214,7 +215,7 @@ namespace vMenuServer
                 string addons = LoadResourceFile(GetCurrentResourceName(), "config/addons.json") ?? "{}";
                 try
                 {
-                    JsonConvert.DeserializeObject<Dictionary<string, List<string>>>(addons);
+                    JsonConvert.DeserializeObject<ConcurrentDictionary<string, List<string>>>(addons);
                     // If the above crashes, then the json is invalid and it'll throw warnings in the console.
                 }
                 catch (JsonReaderException ex)

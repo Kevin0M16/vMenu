@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -17,7 +18,7 @@ namespace vMenuClient
     {
         // Variables
         private Menu menu;
-        public static Dictionary<string, uint> AddonVehicles;
+        public static ConcurrentDictionary<string, uint> AddonVehicles;
 
         public bool SpawnInVehicle { get; private set; } = UserDefaults.VehicleSpawnerSpawnInside;
         public bool ReplaceVehicle { get; private set; } = UserDefaults.VehicleSpawnerReplacePrevious;
@@ -290,7 +291,7 @@ namespace vMenuClient
                 }
 
                 // Create a dictionary for the duplicate vehicle names (in this vehicle class).
-                var duplicateVehNames = new Dictionary<string, int>();
+                var duplicateVehNames = new ConcurrentDictionary<string, int>();
 
                 #region Add vehicles per class
                 // Loop through all the vehicles in the vehicle class.
